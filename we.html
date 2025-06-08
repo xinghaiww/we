@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>会笑的是你 - 播放页面</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #111;
+      color: #fff;
+      font-family: 'Helvetica Neue', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 24px;
+      color: #eee;
+    }
+
+    .player {
+      position: relative;
+      width: 300px;
+      height: 300px;
+    }
+
+    .disc {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 6px solid #444;
+      background-color: #222;
+      background-size: cover;
+      background-position: center;
+      animation: spin 6s linear infinite;
+      animation-play-state: paused;
+    }
+
+    .player.playing .disc {
+      animation-play-state: running;
+    }
+
+    .center-circle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #111;
+      border: 4px solid #aaa;
+      z-index: 2;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    audio {
+      display: none;
+    }
+
+    .hint {
+      margin-top: 20px;
+      color: #aaa;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>会笑的是你 · We 酸月亮</h1>
+  <div class="player" id="player">
+    <div class="disc" id="disc" style="background-image: url('WechatIMG17.jpg');"></div>
+    <div class="center-circle"></div>
+    <audio id="audio" src="会笑的是你 - We 酸月亮.mp3"></audio>
+  </div>
+  <div class="hint">点击唱片播放 / 暂停</div>
+
+  <script>
+    const player = document.getElementById('player');
+    const disc = document.getElementById('disc');
+    const audio = document.getElementById('audio');
+
+    disc.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        player.classList.add('playing');
+      } else {
+        audio.pause();
+        player.classList.remove('playing');
+      }
+    });
+
+    audio.addEventListener('ended', () => {
+      player.classList.remove('playing');
+    });
+  </script>
+</body>
+</html>
