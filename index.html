@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -36,12 +37,9 @@
       h1 {
         font-size: 28px;
       }
+
       .player {
         width: 350px;
-      }
-      input[type="range"] {
-        max-width: 350px;
-        width: 100%;
       }
     }
 
@@ -58,10 +56,8 @@
       animation-play-state: paused;
       position: relative;
       flex-shrink: 0;
-      cursor: pointer;
     }
 
-    /* 手机端唱片放大 */
     @media (max-width: 480px) {
       .disc {
         width: 350px;
@@ -88,8 +84,13 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     audio {
@@ -97,27 +98,19 @@
     }
 
     .hint {
-      margin: 10px 0 20px 0;
+      margin: 20px 0 10px;
       color: #aaa;
       font-size: 14px;
-      user-select: none;
     }
 
     .progress-container {
-      width: 100%;
+      width: 300px;
       margin-top: 10px;
       display: flex;
       align-items: center;
       gap: 10px;
       font-size: 14px;
       color: #ccc;
-      user-select: none;
-    }
-
-    .time-left, .time-right {
-      width: 40px;
-      text-align: center;
-      font-family: monospace;
     }
 
     .progress-bar {
@@ -132,35 +125,35 @@
 
     .progress-bar::-webkit-slider-thumb {
       appearance: none;
-      width: 14px;
-      height: 14px;
-      background: #aaddff;
-      border: 1.5px solid #000;
+      width: 12px;
+      height: 12px;
+      background: #66ccff;
+      /* 淡蓝色 */
+      border: 1px solid #000;
       border-radius: 50%;
       cursor: pointer;
-      margin-top: -4.5px; /* 使thumb垂直居中 */
-      transition: background 0.3s;
-    }
-
-    .progress-bar::-webkit-slider-thumb:hover {
-      background: #88ccff;
     }
 
     .progress-bar::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      background: #aaddff;
-      border: 1.5px solid #000;
+      width: 12px;
+      height: 12px;
+      background: #66ccff;
+      border: 1px solid #000;
       border-radius: 50%;
       cursor: pointer;
       transition: background 0.3s;
     }
 
-    .progress-bar::-moz-range-thumb:hover {
-      background: #88ccff;
+    .time-label {
+      font-family: monospace;
+      color: #aaa;
+      user-select: none;
+      min-width: 45px;
+      text-align: center;
     }
   </style>
 </head>
+
 <body>
   <h1>会笑的是你 - We</h1>
   <div class="player" id="player">
@@ -169,11 +162,10 @@
     </div>
     <div class="hint">点击唱片播放 / 暂停</div>
     <audio id="audio" src="会笑的是你 - We 酸月亮.mp3"></audio>
-
     <div class="progress-container">
-      <div class="time-left" id="current-time">00:00</div>
-      <input type="range" id="progress-bar" class="progress-bar" value="0" min="0" max="100" step="0.1" />
-      <div class="time-right" id="duration">00:00</div>
+      <div class="time-label" id="currentTime">00:00</div>
+      <input type="range" id="progress" class="progress-bar" value="0" min="0" max="100" step="0.1" />
+      <div class="time-label" id="duration">00:00</div>
     </div>
   </div>
 
@@ -181,9 +173,8 @@
     const player = document.getElementById('player');
     const disc = document.getElementById('disc');
     const audio = document.getElementById('audio');
-    const progressBar = document.getElementById('progress-bar');
-    const currentTimeEl = document.getElementById('current-time');
-    const durationEl = document.getElementById('duration');
+    const progress = document.getElementById('progress');
+    const time = document.getElementById('time');
 
     disc.addEventListener('click', () => {
       if (audio.paused) {
@@ -195,24 +186,19 @@
       }
     });
 
-    audio.addEventListener('loadedmetadata', () => {
-      progressBar.max = 100;
-      durationEl.textContent = formatTime(audio.duration);
-    });
-
     audio.addEventListener('timeupdate', () => {
-      if (!progressBar.dragging) {
-        progressBar.value = (audio.currentTime / audio.duration) * 100 || 0;
+      if (!progress.dragging) {
+        progress.value = (audio.currentTime / audio.duration) * 100 || 0;
       }
-      currentTimeEl.textContent = formatTime(audio.currentTime);
+      time.textContent = formatTime(audio.currentTime) + ' / ' + formatTime(audio.duration);
     });
 
-    progressBar.addEventListener('mousedown', () => {
-      progressBar.dragging = true;
+    progress.addEventListener('mousedown', () => {
+      progress.dragging = true;
     });
 
-    progressBar.addEventListener('mouseup', (e) => {
-      progressBar.dragging = false;
+    progress.addEventListener('mouseup', (e) => {
+      progress.dragging = false;
       const percent = e.target.value;
       audio.currentTime = (percent / 100) * audio.duration;
       if (audio.paused) {
@@ -221,13 +207,14 @@
       }
     });
 
-    progressBar.addEventListener('touchstart', () => {
-      progressBar.dragging = true;
+    // 添加触摸事件支持
+    progress.addEventListener('touchstart', () => {
+      progress.dragging = true;
     });
 
-    progressBar.addEventListener('touchend', () => {
-      progressBar.dragging = false;
-      const percent = progressBar.value;
+    progress.addEventListener('touchend', (e) => {
+      progress.dragging = false;
+      const percent = progress.value;
       audio.currentTime = (percent / 100) * audio.duration;
       if (audio.paused) {
         audio.play();
@@ -235,15 +222,15 @@
       }
     });
 
-    progressBar.addEventListener('input', (e) => {
+    progress.addEventListener('input', (e) => {
       const percent = e.target.value;
-      currentTimeEl.textContent = formatTime((percent / 100) * audio.duration);
+      time.textContent = formatTime((percent / 100) * audio.duration) + ' / ' + formatTime(audio.duration);
     });
 
     audio.addEventListener('ended', () => {
       player.classList.remove('playing');
-      progressBar.value = 0;
-      currentTimeEl.textContent = '00:00';
+      progress.value = 0;
+      time.textContent = '00:00 / ' + formatTime(audio.duration);
     });
 
     function formatTime(seconds) {
