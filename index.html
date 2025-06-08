@@ -5,12 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>会笑的是你 - 播放页面</title>
   <style>
-    html, body {
+    body {
       margin: 0;
       padding: 0;
-      overflow-x: hidden;
-    }
-    body {
       background: #111;
       color: #fff;
       font-family: 'Helvetica Neue', sans-serif;
@@ -18,8 +15,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: calc(var(--vh, 1vh) * 100);
-      overflow-y: auto;
+      height: 100vh;
     }
 
     h1 {
@@ -112,20 +108,18 @@
     .progress-bar {
       flex: 1;
       appearance: none;
-      -webkit-appearance: none;
       height: 6px;
       background: #555;
       border-radius: 3px;
       outline: none;
       cursor: pointer;
-      touch-action: none;
     }
 
     .progress-bar::-webkit-slider-thumb {
       appearance: none;
       width: 12px;
       height: 12px;
-      background: #66ccff;
+      background: #66ccff; /* 淡蓝色 */
       border: 1px solid #000;
       border-radius: 50%;
       cursor: pointer;
@@ -165,13 +159,6 @@
   </div>
 
   <script>
-    function setVH() {
-      let vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
-    }
-    setVH();
-    window.addEventListener('resize', setVH);
-
     const player = document.getElementById('player');
     const disc = document.getElementById('disc');
     const audio = document.getElementById('audio');
