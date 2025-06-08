@@ -21,6 +21,7 @@
       margin-bottom: 30px;
       font-size: 24px;
       color: #eee;
+      text-align: center;
     }
 
     .player {
@@ -36,8 +37,10 @@
       overflow: hidden;
       border: 6px solid #444;
       background-color: #222;
-      background-size: cover;
+      background-size: contain;
+      background-repeat: no-repeat;
       background-position: center;
+      background-image: url('WechatIMG17.jpg');
       animation: spin 6s linear infinite;
       animation-play-state: paused;
     }
@@ -77,58 +80,57 @@
     .progress-container {
       width: 300px;
       margin-top: 20px;
+    }
+
+    #progress-bar {
+      width: 100%;
+    }
+
+    .time-display {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      justify-content: space-between;
       font-size: 14px;
       color: #ccc;
-    }
-
-    .progress-bar {
-      flex: 1;
-      appearance: none;
-      height: 6px;
-      background: #555;
-      border-radius: 3px;
-      outline: none;
-      cursor: pointer;
-    }
-
-    .progress-bar::-webkit-slider-thumb {
-      appearance: none;
-      width: 10px;
-      height: 10px;
-      background: #fff;
-      border-radius: 50%;
-      cursor: pointer;
+      margin-top: 5px;
     }
   </style>
 </head>
 <body>
-  <h1>会笑的是你 · We 酸月亮</h1>
+  <h1>会笑的是你 · We</h1>
+
   <div class="player" id="player">
-    <div class="disc" id="disc" style="background-image: url('WechatIMG17.jpg');"></div>
+    <div class="disc" id="disc"></div>
     <div class="center-circle"></div>
     <audio id="audio" src="会笑的是你 - We 酸月亮.mp3"></audio>
   </div>
 
-  <div class="progress-container">
-    <span id="current-time">0:00</span>
-    <input type="range" id="progress-bar" class="progress-bar" value="0" min="0" max="100">
-    <span id="duration">0:00</span>
-  </div>
-
   <div class="hint">点击唱片播放 / 暂停</div>
+
+  <div class="progress-container">
+    <input type="range" id="progress-bar" value="0" min="0" max="100" step="0.1">
+    <div class="time-display">
+      <span id="current-time">0:00</span>
+      <span id="duration">0:00</span>
+    </div>
+  </div>
 
   <script>
     const player = document.getElementById('player');
     const disc = document.getElementById('disc');
     const audio = document.getElementById('audio');
     const progressBar = document.getElementById('progress-bar');
-    const currentTimeEl = document.getElementById('current-time');
-    const durationEl = document.getElementById('duration');
+    const currentTimeDisplay = document.getElementById('current-time');
+    const durationDisplay = document.getElementById('duration');
+
+    let isReady = false;
+
+    audio.addEventListener('canplay', () => {
+      isReady = true;
+      durationDisplay.textContent = formatTime(audio.duration);
+    });
 
     disc.addEventListener('click', () => {
+      if (!isReady) return;
       if (audio.paused) {
         audio.play();
         player.classList.add('playing');
@@ -138,28 +140,26 @@
       }
     });
 
-    audio.addEventListener('loadedmetadata', () => {
-      progressBar.max = audio.duration;
-      durationEl.textContent = formatTime(audio.duration);
-    });
-
-    audio.addEventListener('timeupdate', () => {
-      progressBar.value = audio.currentTime;
-      currentTimeEl.textContent = formatTime(audio.currentTime);
-    });
-
-    progressBar.addEventListener('input', () => {
-      audio.currentTime = progressBar.value;
-    });
-
     audio.addEventListener('ended', () => {
       player.classList.remove('playing');
     });
 
-    function formatTime(time) {
-      const minutes = Math.floor(time / 60);
-      const seconds = Math.floor(time % 60).toString().padStart(2, '0');
-      return `${minutes}:${seconds}`;
+    audio.addEventListener('timeupdate', () => {
+      const percent = (audio.currentTime / audio.duration) * 100;
+      progressBar.value = percent;
+      currentTimeDisplay.textContent = formatTime(audio.currentTime);
+    });
+
+    progressBar.addEventListener('input', () => {
+      if (!isReady) return;
+      const seekTime = (progressBar.value / 100) * audio.duration;
+      audio.currentTime = seekTime;
+    });
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
   </script>
 </body>
