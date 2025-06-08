@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>会笑的是你 - 播放页面</title>
   <style>
     body {
@@ -28,6 +28,7 @@
       position: relative;
       width: 300px;
       height: 300px;
+      cursor: pointer;
     }
 
     .disc {
@@ -37,12 +38,19 @@
       overflow: hidden;
       border: 6px solid #444;
       background-color: #222;
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      background-image: url('WechatIMG17.jpg');
       animation: spin 6s linear infinite;
       animation-play-state: paused;
+      position: relative;
+    }
+
+    .disc img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+      user-select: none;
+      pointer-events: none; /* 点击事件传递给父元素 */
     }
 
     .player.playing .disc {
@@ -60,6 +68,7 @@
       background: #111;
       border: 4px solid #aaa;
       z-index: 2;
+      pointer-events: none;
     }
 
     @keyframes spin {
@@ -75,6 +84,7 @@
       margin-top: 20px;
       color: #aaa;
       font-size: 14px;
+      user-select: none;
     }
 
     .progress-container {
@@ -92,14 +102,17 @@
       font-size: 14px;
       color: #ccc;
       margin-top: 5px;
+      user-select: none;
     }
   </style>
 </head>
 <body>
   <h1>会笑的是你 · We</h1>
 
-  <div class="player" id="player">
-    <div class="disc" id="disc"></div>
+  <div class="player" id="player" title="点击唱片播放 / 暂停">
+    <div class="disc" id="disc">
+      <img src="WechatIMG17.jpg" alt="唱片封面" />
+    </div>
     <div class="center-circle"></div>
     <audio id="audio" src="会笑的是你 - We 酸月亮.mp3"></audio>
   </div>
@@ -107,7 +120,7 @@
   <div class="hint">点击唱片播放 / 暂停</div>
 
   <div class="progress-container">
-    <input type="range" id="progress-bar" value="0" min="0" max="100" step="0.1">
+    <input type="range" id="progress-bar" value="0" min="0" max="100" step="0.1" />
     <div class="time-display">
       <span id="current-time">0:00</span>
       <span id="duration">0:00</span>
@@ -129,7 +142,7 @@
       durationDisplay.textContent = formatTime(audio.duration);
     });
 
-    disc.addEventListener('click', () => {
+    player.addEventListener('click', () => {
       if (!isReady) return;
       if (audio.paused) {
         audio.play();
