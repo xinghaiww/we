@@ -73,6 +73,35 @@
       color: #aaa;
       font-size: 14px;
     }
+
+    .progress-container {
+      width: 300px;
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    .progress-bar {
+      flex: 1;
+      appearance: none;
+      height: 6px;
+      background: #555;
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .progress-bar::-webkit-slider-thumb {
+      appearance: none;
+      width: 10px;
+      height: 10px;
+      background: #fff;
+      border-radius: 50%;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -82,12 +111,22 @@
     <div class="center-circle"></div>
     <audio id="audio" src="会笑的是你 - We 酸月亮.mp3"></audio>
   </div>
+
+  <div class="progress-container">
+    <span id="current-time">0:00</span>
+    <input type="range" id="progress-bar" class="progress-bar" value="0" min="0" max="100">
+    <span id="duration">0:00</span>
+  </div>
+
   <div class="hint">点击唱片播放 / 暂停</div>
 
   <script>
     const player = document.getElementById('player');
     const disc = document.getElementById('disc');
     const audio = document.getElementById('audio');
+    const progressBar = document.getElementById('progress-bar');
+    const currentTimeEl = document.getElementById('current-time');
+    const durationEl = document.getElementById('duration');
 
     disc.addEventListener('click', () => {
       if (audio.paused) {
@@ -99,9 +138,29 @@
       }
     });
 
+    audio.addEventListener('loadedmetadata', () => {
+      progressBar.max = audio.duration;
+      durationEl.textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      progressBar.value = audio.currentTime;
+      currentTimeEl.textContent = formatTime(audio.currentTime);
+    });
+
+    progressBar.addEventListener('input', () => {
+      audio.currentTime = progressBar.value;
+    });
+
     audio.addEventListener('ended', () => {
       player.classList.remove('playing');
     });
+
+    function formatTime(time) {
+      const minutes = Math.floor(time / 60);
+      const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+      return `${minutes}:${seconds}`;
+    }
   </script>
 </body>
 </html>
